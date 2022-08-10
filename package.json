@@ -4,7 +4,7 @@
   "version": "3.1.15",
   "scripts": {
     "test": "npm run build && ./node_modules/.bin/mocha ./tests/*.js --reporter spec",
-    "build": "del -rf ./dist && ./node_modules/.bin/tsc",
+    "build": "tsc",
     "prepare": "npm run build",
     "format": "prettier --write src/**/*.ts"
   },
