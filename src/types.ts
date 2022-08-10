@@ -23,9 +23,11 @@ export interface Request {
 }
 
 export interface Response {
-  status_code?: number
-  status_message?: string
-  success?: boolean
+  success_status: {
+    status_code?: number
+    status_message?: string
+    success?: boolean
+  }
 }
 
 export interface AuthenticationToken extends Response {

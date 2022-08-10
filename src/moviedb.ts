@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { isObject, isString, merge, omit } from 'lodash'
 import {
   HttpMethod,
@@ -8,8 +8,10 @@ import {
   SessionRequestParams,
   SessionResponse,
   QueueItem,
+  Response as ApiResponse,
 } from './types'
 import * as types from './request-types'
+import { responseCodeMap } from './response_code_map'
 
 export class MovieDb {
   private apiKey: string
@@ -143,6 +145,28 @@ export class MovieDb {
     return compiledParams
   }
 
+  private applySuccessStatus(res: AxiosResponse<any, any>, fromError: boolean): AxiosResponse<any, any> {
+    if (res.data.status_code === undefined || res.data.status_code === null) {
+      res.data.status_code = fromError || !res.data ? 15 : 1
+    }
+
+    if (res.data.success === undefined || res.data.success === null) {
+      res.data.success = res.data.status_code === 1 ? true : false
+    }
+
+    if (!res.data.status_message) {
+      res.data.status_message = responseCodeMap[res.data.status_code]
+    }
+
+    res.data.success_status = {
+      status_code: res.data.status_code,
+      success: res.data.success,
+      status_message: res.data.status_message,
+    } as ApiResponse['success_status']
+
+    return res
+  }
+
   /**
    * Performs the request to the server
    */
@@ -179,37 +203,10 @@ export class MovieDb {
           axios
             .request(request)
             .then((res) => {
-              if (!res.data) return
-              if (!res.data.status_code) {
-                res.data.status_code = 1
-              }
-
-              if (!res.data.success) {
-                res.data.success = true
-              }
-
-              if (!res.data.status_message) {
-                res.data.status_message = 'Success.'
-              }
-
-              return res.data
+              return this.applySuccessStatus(res, false)
             })
             .catch((res) => {
-              if (!res.data) return res
-
-              if (!res.data.status_code) {
-                res.data.status_code = 15
-              }
-
-              if (!res.data.success) {
-                res.data.success = false
-              }
-
-              if (!res.data.status_message) {
-                res.data.status_message = 'Failed.'
-              }
-
-              return res.data
+              return this.applySuccessStatus(res, true)
             }),
         resolve,
         reject,
