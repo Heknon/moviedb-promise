@@ -203,10 +203,10 @@ export class MovieDb {
           axios
             .request(request)
             .then((res) => {
-              return this.applySuccessStatus(res, false)
+              return this.applySuccessStatus(res, false).data
             })
             .catch((res) => {
-              return this.applySuccessStatus(res, true)
+              return this.applySuccessStatus(res, true).data
             }),
         resolve,
         reject,
