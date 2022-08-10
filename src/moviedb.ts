@@ -175,7 +175,42 @@ export class MovieDb {
     // Push the request to the queue
     return new Promise((resolve, reject) => {
       this.requests.push({
-        promiseGenerator: () => axios.request(request).then((res) => res.data),
+        promiseGenerator: () =>
+          axios
+            .request(request)
+            .then((res) => {
+              if (!res.data) return
+              if (!res.data.status_code) {
+                res.data.status_code = 1
+              }
+
+              if (!res.data.success) {
+                res.data.success = true
+              }
+
+              if (!res.data.status_message) {
+                res.data.status_message = 'Success.'
+              }
+
+              return res.data
+            })
+            .catch((res) => {
+              if (!res.data) return res
+
+              if (!res.data.status_code) {
+                res.data.status_code = 15
+              }
+
+              if (!res.data.success) {
+                res.data.success = false
+              }
+
+              if (!res.data.status_message) {
+                res.data.status_message = 'Failed.'
+              }
+
+              return res.data
+            }),
         resolve,
         reject,
       })
@@ -743,7 +778,10 @@ export class MovieDb {
     )
   }
 
-  personInfo(params: string | number | types.IdAppendToResponseRequest, axiosConfig?: AxiosRequestConfig): Promise<types.Person> {
+  personInfo(
+    params: string | number | types.IdAppendToResponseRequest,
+    axiosConfig?: AxiosRequestConfig,
+  ): Promise<types.Person> {
     return this.makeRequest(HttpMethod.Get, 'person/:id', params, axiosConfig)
   }
 
