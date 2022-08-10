@@ -24,9 +24,9 @@ export interface Request {
 
 export interface Response {
   success_status: {
-    status_code?: number
-    status_message?: string
-    success?: boolean
+    status_code: number
+    status_message: string
+    success: boolean
   }
 }
 
