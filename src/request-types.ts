@@ -59,6 +59,7 @@ export interface PersonResult {
   id?: number
   name?: string
   popularity?: number
+  media_type: 'person'
   known_for?: Array<MovieResult | TvResult>
 }
 
