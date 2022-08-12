@@ -279,6 +279,7 @@ export interface Episode {
   name?: string
   overview?: string
   id?: number
+  runtime?: number | null;
   production_code?: string | null
   season_number?: number
   still_path?: string | null
